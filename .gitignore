@@ -39,3 +39,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# content staging (raw resumes, unoptimized photos — curate before committing)
+/content-source/
+/public/images/
+# curated/optimized assets at /public/* root remain tracked.

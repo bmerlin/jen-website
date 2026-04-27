@@ -1,102 +1,394 @@
-import { buttonVariants } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { certifications } from "@/content/certifications";
+import Image from "next/image";
+
 import { education } from "@/content/education";
 import { experience } from "@/content/experience";
+import { metrics } from "@/content/metrics";
 import { site } from "@/content/site";
 import { skills } from "@/content/skills";
+import { testimonials } from "@/content/testimonials";
+
+const formatRange = (start?: string, end?: string) => {
+  const startLabel = start ? formatMonth(start) : "";
+  const endLabel = end ? formatMonth(end) : "Present";
+  return startLabel ? `${startLabel} – ${endLabel}` : endLabel;
+};
+
+function formatMonth(value: string) {
+  // Accepts "YYYY", "YYYY-MM", or "YYYY-MM-DD".
+  const parts = value.split("-");
+  if (parts.length === 1) return parts[0];
+  const [year, month] = parts;
+  const date = new Date(Number(year), Number(month) - 1, 1);
+  return date.toLocaleString("en-US", { month: "short", year: "numeric" });
+}
 
 export default function Home() {
   return (
-    <main className="mx-auto max-w-3xl px-6 py-16 sm:py-24">
-      <section className="space-y-4">
-        <p className="text-sm font-medium text-muted-foreground">{site.title}</p>
-        <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">{site.name}</h1>
-        <p className="text-lg text-muted-foreground">{site.tagline}</p>
-        <p className="max-w-2xl text-base leading-7">{site.description}</p>
-        <div className="flex gap-3 pt-2">
-          <a href={`mailto:${site.email}`} className={buttonVariants({ size: "lg" })}>
-            Get in touch
-          </a>
-          {site.linkedin && (
-            <a
-              href={site.linkedin}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={buttonVariants({ variant: "outline", size: "lg" })}
-            >
-              LinkedIn
-            </a>
-          )}
-        </div>
-      </section>
+    <div className="min-h-screen bg-background text-foreground">
+      <Nav />
+      <Hero />
+      <PivotNarrative />
+      <MetricsBand />
+      <ExperienceSection />
+      <EducationSection />
+      <SkillsSection />
+      {testimonials.length > 0 && <TestimonialsSection />}
+      <ContactSection />
+      <Footer />
+    </div>
+  );
+}
 
-      <section className="mt-16 space-y-6">
-        <h2 className="text-2xl font-semibold tracking-tight">Experience</h2>
-        <div className="space-y-4">
+function Nav() {
+  return (
+    <nav className="sticky top-0 z-10 border-b border-border/60 bg-background/85 backdrop-blur">
+      <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
+        <a href="#top" className="font-serif text-lg tracking-tight">
+          {site.name}
+        </a>
+        <ul className="hidden gap-7 text-sm text-muted-foreground sm:flex">
+          <li>
+            <a href="#story" className="hover:text-foreground">
+              Story
+            </a>
+          </li>
+          <li>
+            <a href="#experience" className="hover:text-foreground">
+              Experience
+            </a>
+          </li>
+          <li>
+            <a href="#education" className="hover:text-foreground">
+              Education
+            </a>
+          </li>
+          <li>
+            <a href="#contact" className="hover:text-foreground">
+              Contact
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+  );
+}
+
+function Hero() {
+  return (
+    <section id="top" className="border-b border-border/60">
+      <div className="mx-auto grid max-w-6xl gap-12 px-6 py-20 sm:py-28 lg:grid-cols-[1.4fr_1fr] lg:gap-16">
+        <div className="flex flex-col justify-center">
+          <p className="font-mono text-xs uppercase tracking-[0.2em] text-primary">
+            {site.title}
+          </p>
+          <h1 className="mt-6 font-serif text-5xl leading-[1.05] tracking-tight sm:text-7xl">
+            {site.name}
+          </h1>
+          <p className="mt-8 max-w-xl font-serif text-2xl leading-snug text-foreground/90 sm:text-3xl">
+            {site.tagline}
+          </p>
+          <div className="mt-10 flex flex-wrap gap-3">
+            <a
+              href="#contact"
+              className="inline-flex h-11 items-center rounded-md bg-primary px-6 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            >
+              Get in touch
+            </a>
+            <a
+              href="#story"
+              className="inline-flex h-11 items-center rounded-md border border-border bg-background px-6 text-sm font-medium transition-colors hover:bg-muted"
+            >
+              Read the pivot story
+            </a>
+          </div>
+        </div>
+        <div className="relative aspect-[3/4] overflow-hidden rounded-lg bg-foreground/5 lg:aspect-auto lg:min-h-[560px]">
+          <Image
+            src="/portrait-jen.jpg"
+            alt={`${site.name}, ${site.title}`}
+            fill
+            priority
+            sizes="(min-width: 1024px) 40vw, 100vw"
+            className="object-cover object-top"
+          />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function PivotNarrative() {
+  return (
+    <section id="story" className="border-b border-border/60 bg-secondary/40">
+      <div className="mx-auto grid max-w-5xl gap-10 px-6 py-20 sm:grid-cols-[1fr_2fr] sm:py-28">
+        <div>
+          <p className="font-mono text-xs uppercase tracking-[0.2em] text-primary">
+            The Story
+          </p>
+          <h2 className="mt-4 font-serif text-3xl leading-tight sm:text-4xl">
+            Why pharmaceutical sales. Why now.
+          </h2>
+        </div>
+        <div className="space-y-6 text-base leading-7 text-foreground/85">
+          <p className="font-serif text-2xl italic leading-snug text-foreground">
+            &ldquo;{site.pivotStatement}&rdquo;
+          </p>
+          <p>{site.description}</p>
+          <p>
+            Pharmaceutical sales asks for a specific intersection: scientific
+            literacy a clinician will respect, and the discipline of
+            consultative, relationship-driven selling. I&rsquo;ve been
+            building both ends of that intersection for the better part of a
+            decade — first by training, then by practice, and now by choice.
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function MetricsBand() {
+  return (
+    <section className="border-b border-border/60">
+      <div className="mx-auto max-w-5xl px-6 py-20 sm:py-24">
+        <p className="font-mono text-xs uppercase tracking-[0.2em] text-primary">
+          By the Numbers
+        </p>
+        <h2 className="mt-4 font-serif text-3xl leading-tight sm:text-4xl">
+          A track record of revenue, relationships, and reach.
+        </h2>
+        <div className="mt-12 grid gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-2 lg:grid-cols-3">
+          {metrics.map((m) => (
+            <div key={m.label} className="bg-card p-6">
+              <p className="font-serif text-5xl leading-none tracking-tight text-primary">
+                {m.value}
+              </p>
+              <p className="mt-3 text-sm font-medium">{m.label}</p>
+              {m.context && (
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                  {m.context}
+                </p>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ExperienceSection() {
+  return (
+    <section id="experience" className="border-b border-border/60 bg-secondary/40">
+      <div className="mx-auto max-w-5xl px-6 py-20 sm:py-28">
+        <p className="font-mono text-xs uppercase tracking-[0.2em] text-primary">
+          Experience
+        </p>
+        <h2 className="mt-4 font-serif text-3xl leading-tight sm:text-4xl">
+          Ten years of commercial leadership.
+        </h2>
+        <ol className="mt-12 space-y-10">
           {experience.map((role) => (
-            <Card key={`${role.company}-${role.startDate}`}>
-              <CardHeader>
-                <div className="flex flex-wrap items-baseline justify-between gap-2">
-                  <CardTitle className="text-lg">
-                    {role.role} · {role.company}
-                  </CardTitle>
-                  <span className="text-sm text-muted-foreground">
-                    {role.startDate} – {role.endDate ?? "Present"}
-                  </span>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <ul className="list-disc space-y-1 pl-5 text-sm leading-6">
+            <li
+              key={`${role.company}-${role.startDate}`}
+              className="grid gap-6 border-t border-border/70 pt-8 sm:grid-cols-[1fr_2fr]"
+            >
+              <div>
+                <p className="font-serif text-xl leading-tight">{role.company}</p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {role.location}
+                </p>
+                <p className="mt-3 font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">
+                  {formatRange(role.startDate, role.endDate)}
+                </p>
+              </div>
+              <div>
+                <p className="text-base font-medium">{role.role}</p>
+                {role.summary && (
+                  <p className="mt-3 text-sm leading-7 text-foreground/85">
+                    {role.summary}
+                  </p>
+                )}
+                <ul className="mt-4 space-y-2 text-sm leading-6 text-foreground/85">
                   {role.highlights.map((h) => (
-                    <li key={h}>{h}</li>
+                    <li key={h} className="flex gap-3">
+                      <span
+                        aria-hidden
+                        className="mt-2 inline-block size-1 shrink-0 rounded-full bg-primary"
+                      />
+                      <span>{h}</span>
+                    </li>
                   ))}
                 </ul>
-              </CardContent>
-            </Card>
+              </div>
+            </li>
           ))}
-        </div>
-      </section>
+        </ol>
+      </div>
+    </section>
+  );
+}
 
-      <section className="mt-16 space-y-6">
-        <h2 className="text-2xl font-semibold tracking-tight">Education</h2>
-        <div className="space-y-2">
+function EducationSection() {
+  return (
+    <section id="education" className="border-b border-border/60">
+      <div className="mx-auto grid max-w-5xl gap-10 px-6 py-20 sm:grid-cols-[1fr_2fr] sm:py-24">
+        <div>
+          <p className="font-mono text-xs uppercase tracking-[0.2em] text-primary">
+            Education
+          </p>
+          <h2 className="mt-4 font-serif text-3xl leading-tight sm:text-4xl">
+            A clinical foundation, not a career-change crash course.
+          </h2>
+        </div>
+        <ul className="space-y-6">
           {education.map((e) => (
-            <div key={`${e.institution}-${e.startDate}`} className="text-sm leading-6">
-              <p className="font-medium">{e.institution}</p>
-              <p className="text-muted-foreground">
-                {e.credential}
-                {e.field ? `, ${e.field}` : ""} · {e.startDate} – {e.endDate ?? "Present"}
+            <li
+              key={`${e.institution}-${e.credential}-${e.field ?? ""}`}
+              className="border-t border-border/70 pt-6"
+            >
+              <p className="font-serif text-xl leading-tight">{e.credential}</p>
+              {e.field && (
+                <p className="mt-1 text-sm text-foreground/85">{e.field}</p>
+              )}
+              <p className="mt-2 text-sm text-muted-foreground">
+                {e.institution}
+                {e.endDate ? ` · ${formatMonth(e.endDate)}` : ""}
+                {e.status === "in-progress" ? " · In progress" : ""}
               </p>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  );
+}
+
+function SkillsSection() {
+  return (
+    <section className="border-b border-border/60 bg-secondary/40">
+      <div className="mx-auto max-w-5xl px-6 py-20 sm:py-24">
+        <p className="font-mono text-xs uppercase tracking-[0.2em] text-primary">
+          Capabilities
+        </p>
+        <h2 className="mt-4 font-serif text-3xl leading-tight sm:text-4xl">
+          What I bring to a territory.
+        </h2>
+        <div className="mt-12 grid gap-8 sm:grid-cols-2">
+          {skills.map((group) => (
+            <div key={group.category}>
+              <p className="font-serif text-xl">{group.category}</p>
+              <ul className="mt-4 space-y-2 text-sm leading-6 text-foreground/85">
+                {group.items.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
             </div>
           ))}
         </div>
-      </section>
+      </div>
+    </section>
+  );
+}
 
-      <section className="mt-16 space-y-6">
-        <h2 className="text-2xl font-semibold tracking-tight">Skills</h2>
-        <div className="grid gap-4 sm:grid-cols-2">
-          {skills.map((s) => (
-            <div key={s.category}>
-              <p className="font-medium">{s.category}</p>
-              <p className="text-sm text-muted-foreground">{s.items.join(" · ")}</p>
-            </div>
+function TestimonialsSection() {
+  return (
+    <section className="border-b border-border/60">
+      <div className="mx-auto max-w-5xl px-6 py-20 sm:py-24">
+        <p className="font-mono text-xs uppercase tracking-[0.2em] text-primary">
+          References
+        </p>
+        <h2 className="mt-4 font-serif text-3xl leading-tight sm:text-4xl">
+          What collaborators say.
+        </h2>
+        <div className="mt-12 grid gap-6 sm:grid-cols-2">
+          {testimonials.map((t) => (
+            <figure
+              key={t.attribution}
+              className="rounded-lg border border-border bg-card p-6"
+            >
+              <blockquote className="font-serif text-lg italic leading-snug">
+                &ldquo;{t.quote}&rdquo;
+              </blockquote>
+              <figcaption className="mt-4 text-sm text-muted-foreground">
+                {t.attribution}
+                {t.relationship ? ` · ${t.relationship}` : ""}
+              </figcaption>
+            </figure>
           ))}
         </div>
-      </section>
+      </div>
+    </section>
+  );
+}
 
-      {certifications.length > 0 && (
-        <section className="mt-16 space-y-6">
-          <h2 className="text-2xl font-semibold tracking-tight">Certifications</h2>
-          <ul className="space-y-2 text-sm leading-6">
-            {certifications.map((c) => (
-              <li key={`${c.name}-${c.issuer}`}>
-                <span className="font-medium">{c.name}</span> · {c.issuer} · {c.issuedDate}
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
-    </main>
+function ContactSection() {
+  return (
+    <section id="contact" className="bg-primary text-primary-foreground">
+      <div className="mx-auto max-w-5xl px-6 py-20 sm:py-28">
+        <p className="font-mono text-xs uppercase tracking-[0.2em] opacity-70">
+          Contact
+        </p>
+        <h2 className="mt-4 font-serif text-3xl leading-tight sm:text-5xl">
+          Ready to talk territory.
+        </h2>
+        <p className="mt-6 max-w-2xl text-base leading-7 opacity-90">
+          For recruiters, hiring managers, and district managers — the fastest
+          way to reach me is email. I respond within one business day.
+        </p>
+        <dl className="mt-10 grid gap-6 sm:grid-cols-3">
+          <div>
+            <dt className="font-mono text-xs uppercase tracking-[0.2em] opacity-60">
+              Email
+            </dt>
+            <dd className="mt-2 text-base">
+              <a href={`mailto:${site.email}`} className="hover:underline">
+                {site.email}
+              </a>
+            </dd>
+          </div>
+          {site.phone && (
+            <div>
+              <dt className="font-mono text-xs uppercase tracking-[0.2em] opacity-60">
+                Phone
+              </dt>
+              <dd className="mt-2 text-base">
+                <a href={`tel:${site.phone.replace(/[^\d]/g, "")}`} className="hover:underline">
+                  {site.phone}
+                </a>
+              </dd>
+            </div>
+          )}
+          {site.linkedin && (
+            <div>
+              <dt className="font-mono text-xs uppercase tracking-[0.2em] opacity-60">
+                LinkedIn
+              </dt>
+              <dd className="mt-2 text-base">
+                <a
+                  href={site.linkedin}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:underline"
+                >
+                  jenleighbrewster
+                </a>
+              </dd>
+            </div>
+          )}
+        </dl>
+        <p className="mt-12 text-sm opacity-70">Based in {site.location}.</p>
+      </div>
+    </section>
+  );
+}
+
+function Footer() {
+  return (
+    <footer className="border-t border-border/60 bg-background py-8 text-center text-xs text-muted-foreground">
+      <p>
+        © {new Date().getFullYear()} {site.name}. {site.location}.
+      </p>
+    </footer>
   );
 }
