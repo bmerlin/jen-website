@@ -40,7 +40,10 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# content staging (raw resumes, unoptimized photos — curate before committing)
+# content staging (raw resumes, unoptimized photos — curate before committing).
+# Raw photos live at /content-source/raw-photos/, NOT under /public/, so they
+# don't get bundled into the static export.
 /content-source/
-/public/images/
-# curated/optimized assets at /public/* root remain tracked.
+
+# Next.js static export output.
+/out/
