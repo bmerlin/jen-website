@@ -1,11 +1,21 @@
 import Image from "next/image";
 
-import { education } from "@/content/education";
-import { experience } from "@/content/experience";
-import { metrics } from "@/content/metrics";
-import { site } from "@/content/site";
-import { skills } from "@/content/skills";
-import { testimonials } from "@/content/testimonials";
+import {
+  getEducation,
+  getExperience,
+  getMetrics,
+  getSite,
+  getSkills,
+  getTestimonials,
+} from "@/sanity/queries";
+import type {
+  Education,
+  Experience,
+  Metric,
+  SiteConfig,
+  SkillGroup,
+  Testimonial,
+} from "@/sanity/types";
 
 const formatRange = (start?: string, end?: string) => {
   const startLabel = start ? formatMonth(start) : "";
@@ -22,24 +32,36 @@ function formatMonth(value: string) {
   return date.toLocaleString("en-US", { month: "short", year: "numeric" });
 }
 
-export default function Home() {
+export default async function Home() {
+  const [site, metrics, experience, education, skills, testimonials] =
+    await Promise.all([
+      getSite(),
+      getMetrics(),
+      getExperience(),
+      getEducation(),
+      getSkills(),
+      getTestimonials(),
+    ]);
+
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <Nav />
-      <Hero />
-      <PivotNarrative />
-      <MetricsBand />
-      <ExperienceSection />
-      <EducationSection />
-      <SkillsSection />
-      {testimonials.length > 0 && <TestimonialsSection />}
-      <ContactSection />
-      <Footer />
+      <Nav site={site} />
+      <Hero site={site} />
+      <PivotNarrative site={site} />
+      <MetricsBand metrics={metrics} />
+      <ExperienceSection experience={experience} />
+      <EducationSection education={education} />
+      <SkillsSection skills={skills} />
+      {testimonials.length > 0 && (
+        <TestimonialsSection testimonials={testimonials} />
+      )}
+      <ContactSection site={site} />
+      <Footer site={site} />
     </div>
   );
 }
 
-function Nav() {
+function Nav({ site }: { site: SiteConfig }) {
   return (
     <nav className="sticky top-0 z-10 border-b border-border/60 bg-background/85 backdrop-blur">
       <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
@@ -73,7 +95,7 @@ function Nav() {
   );
 }
 
-function Hero() {
+function Hero({ site }: { site: SiteConfig }) {
   return (
     <section id="top" className="border-b border-border/60">
       <div className="mx-auto grid max-w-6xl gap-12 px-6 py-20 sm:py-28 lg:grid-cols-[1.4fr_1fr] lg:gap-16">
@@ -117,7 +139,7 @@ function Hero() {
   );
 }
 
-function PivotNarrative() {
+function PivotNarrative({ site }: { site: SiteConfig }) {
   return (
     <section id="story" className="border-b border-border/60 bg-secondary/40">
       <div className="mx-auto grid max-w-5xl gap-10 px-6 py-20 sm:grid-cols-[1fr_2fr] sm:py-28">
@@ -147,7 +169,7 @@ function PivotNarrative() {
   );
 }
 
-function MetricsBand() {
+function MetricsBand({ metrics }: { metrics: Metric[] }) {
   return (
     <section className="border-b border-border/60">
       <div className="mx-auto max-w-5xl px-6 py-20 sm:py-24">
@@ -159,7 +181,7 @@ function MetricsBand() {
         </h2>
         <div className="mt-12 grid gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-2 lg:grid-cols-3">
           {metrics.map((m) => (
-            <div key={m.label} className="bg-card p-6">
+            <div key={m._id} className="bg-card p-6">
               <p className="font-serif text-5xl leading-none tracking-tight text-primary">
                 {m.value}
               </p>
@@ -177,7 +199,7 @@ function MetricsBand() {
   );
 }
 
-function ExperienceSection() {
+function ExperienceSection({ experience }: { experience: Experience[] }) {
   return (
     <section id="experience" className="border-b border-border/60 bg-secondary/40">
       <div className="mx-auto max-w-5xl px-6 py-20 sm:py-28">
@@ -190,7 +212,7 @@ function ExperienceSection() {
         <ol className="mt-12 space-y-10">
           {experience.map((role) => (
             <li
-              key={`${role.company}-${role.startDate}`}
+              key={role._id}
               className="grid gap-6 border-t border-border/70 pt-8 sm:grid-cols-[1fr_2fr]"
             >
               <div>
@@ -229,7 +251,7 @@ function ExperienceSection() {
   );
 }
 
-function EducationSection() {
+function EducationSection({ education }: { education: Education[] }) {
   return (
     <section id="education" className="border-b border-border/60">
       <div className="mx-auto grid max-w-5xl gap-10 px-6 py-20 sm:grid-cols-[1fr_2fr] sm:py-24">
@@ -243,10 +265,7 @@ function EducationSection() {
         </div>
         <ul className="space-y-6">
           {education.map((e) => (
-            <li
-              key={`${e.institution}-${e.credential}-${e.field ?? ""}`}
-              className="border-t border-border/70 pt-6"
-            >
+            <li key={e._id} className="border-t border-border/70 pt-6">
               <p className="font-serif text-xl leading-tight">{e.credential}</p>
               {e.field && (
                 <p className="mt-1 text-sm text-foreground/85">{e.field}</p>
@@ -264,7 +283,7 @@ function EducationSection() {
   );
 }
 
-function SkillsSection() {
+function SkillsSection({ skills }: { skills: SkillGroup[] }) {
   return (
     <section className="border-b border-border/60 bg-secondary/40">
       <div className="mx-auto max-w-5xl px-6 py-20 sm:py-24">
@@ -276,7 +295,7 @@ function SkillsSection() {
         </h2>
         <div className="mt-12 grid gap-8 sm:grid-cols-2">
           {skills.map((group) => (
-            <div key={group.category}>
+            <div key={group._id}>
               <p className="font-serif text-xl">{group.category}</p>
               <ul className="mt-4 space-y-2 text-sm leading-6 text-foreground/85">
                 {group.items.map((item) => (
@@ -291,7 +310,7 @@ function SkillsSection() {
   );
 }
 
-function TestimonialsSection() {
+function TestimonialsSection({ testimonials }: { testimonials: Testimonial[] }) {
   return (
     <section className="border-b border-border/60">
       <div className="mx-auto max-w-5xl px-6 py-20 sm:py-24">
@@ -304,7 +323,7 @@ function TestimonialsSection() {
         <div className="mt-12 grid gap-6 sm:grid-cols-2">
           {testimonials.map((t) => (
             <figure
-              key={t.attribution}
+              key={t._id}
               className="rounded-lg border border-border bg-card p-6"
             >
               <blockquote className="font-serif text-lg italic leading-snug">
@@ -322,7 +341,7 @@ function TestimonialsSection() {
   );
 }
 
-function ContactSection() {
+function ContactSection({ site }: { site: SiteConfig }) {
   return (
     <section id="contact" className="bg-primary text-primary-foreground">
       <div className="mx-auto max-w-5xl px-6 py-20 sm:py-28">
@@ -371,7 +390,7 @@ function ContactSection() {
                   rel="noopener noreferrer"
                   className="hover:underline"
                 >
-                  jenleighbrewster
+                  {prettifyLinkedinUrl(site.linkedin)}
                 </a>
               </dd>
             </div>
@@ -383,7 +402,11 @@ function ContactSection() {
   );
 }
 
-function Footer() {
+function prettifyLinkedinUrl(url: string) {
+  return url.replace(/^https?:\/\/(www\.)?linkedin\.com\/in\//, "").replace(/\/$/, "");
+}
+
+function Footer({ site }: { site: SiteConfig }) {
   return (
     <footer className="border-t border-border/60 bg-background py-8 text-center text-xs text-muted-foreground">
       <p>
