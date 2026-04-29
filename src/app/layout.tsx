@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Cormorant_Garamond } from "next/font/google";
 
-import { site } from "@/content/site";
+import { getSite } from "@/sanity/queries";
 
 import "./globals.css";
 
@@ -16,10 +16,13 @@ const cormorant = Cormorant_Garamond({
   weight: ["400", "500", "600", "700"],
 });
 
-export const metadata: Metadata = {
-  title: `${site.name} · ${site.title}`,
-  description: site.description,
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const site = await getSite();
+  return {
+    title: `${site.name} · ${site.title}`,
+    description: site.description,
+  };
+}
 
 export default function RootLayout({
   children,
