@@ -10,12 +10,6 @@ import type {
   Testimonial,
 } from "./types";
 
-// Force every build to fetch fresh from Sanity. Without this, Next.js's
-// persistent fetch cache (which Cloudflare restores from its build-output
-// cache across builds) can serve stale data even though `useCdn: false`
-// bypasses Sanity's own CDN.
-const noCache = { next: { revalidate: 0 } } as const;
-
 const SITE_QUERY = groq`*[_type == "site"][0]{
   name, title, tagline, pivotStatement, description, location,
   email, phone, linkedin, resumeUrl
@@ -41,15 +35,9 @@ const TESTIMONIALS_QUERY = groq`*[_type == "testimonial"] | order(order asc, _cr
   _id, quote, attribution, relationship
 }`;
 
-export const getSite = () =>
-  sanityClient.fetch<SiteConfig>(SITE_QUERY, {}, noCache);
-export const getMetrics = () =>
-  sanityClient.fetch<Metric[]>(METRICS_QUERY, {}, noCache);
-export const getExperience = () =>
-  sanityClient.fetch<Experience[]>(EXPERIENCE_QUERY, {}, noCache);
-export const getEducation = () =>
-  sanityClient.fetch<Education[]>(EDUCATION_QUERY, {}, noCache);
-export const getSkills = () =>
-  sanityClient.fetch<SkillGroup[]>(SKILLS_QUERY, {}, noCache);
-export const getTestimonials = () =>
-  sanityClient.fetch<Testimonial[]>(TESTIMONIALS_QUERY, {}, noCache);
+export const getSite = () => sanityClient.fetch<SiteConfig>(SITE_QUERY);
+export const getMetrics = () => sanityClient.fetch<Metric[]>(METRICS_QUERY);
+export const getExperience = () => sanityClient.fetch<Experience[]>(EXPERIENCE_QUERY);
+export const getEducation = () => sanityClient.fetch<Education[]>(EDUCATION_QUERY);
+export const getSkills = () => sanityClient.fetch<SkillGroup[]>(SKILLS_QUERY);
+export const getTestimonials = () => sanityClient.fetch<Testimonial[]>(TESTIMONIALS_QUERY);
