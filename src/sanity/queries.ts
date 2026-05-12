@@ -11,7 +11,7 @@ import type {
 } from "./types";
 
 const SITE_QUERY = groq`*[_type == "site"][0]{
-  name, title, tagline, pivotStatement, description, location,
+  name, title, tagline, pivotStatement, description, experienceHeading, location,
   email, phone, linkedin, resumeUrl
 }`;
 

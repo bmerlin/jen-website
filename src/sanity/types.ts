@@ -7,6 +7,7 @@ export type SiteConfig = {
   tagline: string;
   pivotStatement: string;
   description: string;
+  experienceHeading?: string;
   location: string;
   email: string;
   phone?: string;

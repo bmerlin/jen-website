@@ -43,6 +43,12 @@ export const site = defineType({
       validation: (R) => R.required(),
     }),
     defineField({
+      name: "experienceHeading",
+      title: "Experience section heading",
+      description: "The big serif sentence at the top of the Experience section (e.g., 'Fifteen plus years of commercial leadership.').",
+      type: "string",
+    }),
+    defineField({
       name: "location",
       title: "Location",
       type: "string",

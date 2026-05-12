@@ -49,7 +49,7 @@ export default async function Home() {
       <Hero site={site} />
       <PivotNarrative site={site} />
       <MetricsBand metrics={metrics} />
-      <ExperienceSection experience={experience} />
+      <ExperienceSection site={site} experience={experience} />
       <EducationSection education={education} />
       <SkillsSection skills={skills} />
       {testimonials.length > 0 && (
@@ -199,7 +199,13 @@ function MetricsBand({ metrics }: { metrics: Metric[] }) {
   );
 }
 
-function ExperienceSection({ experience }: { experience: Experience[] }) {
+function ExperienceSection({
+  site,
+  experience,
+}: {
+  site: SiteConfig;
+  experience: Experience[];
+}) {
   return (
     <section id="experience" className="border-b border-border/60 bg-secondary/40">
       <div className="mx-auto max-w-5xl px-6 py-20 sm:py-28">
@@ -207,7 +213,7 @@ function ExperienceSection({ experience }: { experience: Experience[] }) {
           Experience
         </p>
         <h2 className="mt-4 font-serif text-3xl leading-tight sm:text-4xl">
-          Ten years of commercial leadership.
+          {site.experienceHeading ?? "Fifteen plus years of commercial leadership."}
         </h2>
         <ol className="mt-12 space-y-10">
           {experience.map((role) => (
